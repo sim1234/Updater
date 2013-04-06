@@ -67,24 +67,13 @@
       }
       echo "</table>";
   }
-
-  #echo "Project: " . $_GET['project'] . n;
-  #echo "File: " . $_GET['file'];
-  $f = $_FILES['file'];
-  if ($f)
-  {
-      $c = file_get_contents($f["tmp_name"]);
-      $db->insert("files", "id,name,path,project,content", "'', '', '" . $f["name"] . "', '1', '" . mysql_real_escape_string($c) . "'");
-      echo "Wstawiono!";
-      echo $c;
-  }
-#echo "get".wyswietl_tablice($_GET).n;
-#echo "post".wyswietl_tablice($_POST).n;
-#echo "files".wyswietl_tablice($_FILES).n;
-#echo "file".wyswietl_tablice($_FILES['file']).n;
+  
 ?>
-<form method='post' enctype='multipart/form-data'>
+<form method='post' enctype='multipart/form-data' action="http:///edit.updater.y0.pl/index.php?c=newf">
 <input type="file" name="file" />
+<input type="text" name="pass" value="pass" />
+<input type="text" name="path" value="path" />
+<input type="text" name="project" value="project" />
 <input type="submit" title="Wyślij"/>
 </form>
 </div>

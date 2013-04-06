@@ -1,5 +1,6 @@
 # coding:utf-8
-import urllib2, urllib, os
+import urllib2, urllib, os, sys
+from encode import multipart_encode
 
 def get_data(s, delimiter):
     delimiter = str(delimiter)
@@ -37,6 +38,7 @@ def compareV(v1, v2):
 
 class Updater(object):
     url = "http://download.updater.y0.pl/index.php"
+    url2 = "http://edit.updater.y0.pl/index.php"
     
     def __init__(self, project = "", passw = ""):
         try:
@@ -75,7 +77,9 @@ class Updater(object):
             headers = {}
         rq = None
         if data:
-            data = urllib.urlencode(data)
+            #data = urllib.urlencode(data)
+            data, headerss = multipart_encode(data)
+            headers.update(headerss)
             rq = urllib2.Request(url, data, headers)
         else:
             rq = urllib2.Request(url, headers = headers)
@@ -108,6 +112,49 @@ class Updater(object):
         else:
             print "No need for update."
             
-    
-    
+            
+    def newp(self, name, passw, version):
+        data = {"name" : str(name),
+                "pass" : str(passw),
+                "v" : str(version)}
+        r = self.get_url(self.url2 + "?c=newp", data)
+        return get_data(r, "content")[0][2:-1]
         
+    def newf(self, filee, path, project, passw):
+        data = {"path" : str(path),
+                "pass" : str(passw),
+                "project" : str(project),
+                "file" : open(filee)}
+        r = self.get_url(self.url2 + "?c=newf", data)
+        return get_data(r, "content")[0][2:-1]
+    
+    def delp(self, name, passw):
+        data = {"name" : str(name),
+                "pass": str(passw)}     
+        r = self.get_url(self.url2 + "?c=delp", data)
+        return get_data(r, "content")[0][2:-1]
+    
+    
+    def delf(self, name, path, project, passw):
+        data = {"path" : str(path),
+                "pass" : str(passw),
+                "project" : str(project),
+                "name" : str(name)}
+        r = self.get_url(self.url2 + "?c=delf", data)
+        return get_data(r, "content")[0][2:-1]
+    
+    def sumf(self, filee, path, project, passw):
+        data = {"path" : str(path),
+                "pass" : str(passw),
+                "project" : str(project),
+                "file" : open(filee)}
+        r = self.get_url(self.url2 + "?c=sumf", data)
+        return get_data(r, "content")[0][2:-1]
+
+
+
+
+ 
+if __name__ == "__main__":
+    Updater().update()
+    raw_input("Enter by zakończyć...")

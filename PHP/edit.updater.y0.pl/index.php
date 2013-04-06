@@ -23,7 +23,6 @@
 
       case "newf":
           $f = $_FILES['file'];
-          echo $f['name'];
           newf($db, file_get_contents($f["tmp_name"]), $f["name"], $_POST['path'], $_POST['project'], $_POST['pass'], 1);
           break;
 
@@ -32,12 +31,11 @@
           break;
 
       case "delf":
-          delf($db, $_GET['project'], $_POST['pass'], $_POST['name'], $_POST['path']);
+          delf($db, $_POST['project'], $_POST['pass'], $_POST['name'], $_POST['path']);
           break;
           
       case "sumf":
           $f = $_FILES['file'];
-          echo $f['name'];
           sumf($db, file_get_contents($f["tmp_name"]), $f["name"], $_POST['path'], $_POST['project'], $_POST['pass']);
           break;
 
@@ -52,24 +50,12 @@
           break;
   }
 
-  #echo "Project: " . $_GET['project'] . n;
-  #echo "File: " . $_GET['file'];
-  $f = $_FILES['file'];
-  if ($f && 0)
-  {
-      $c = file_get_contents($f["tmp_name"]);
-      $db->insert("files", "id,name,path,project,content", "'', '" . $f["name"] . "', '', '1', '" . mysql_real_escape_string($c) .
-          "'");
-      echo "Wstawiono!";
-      echo $c;
-  }
-
 ?>
 </content>
-<form method='post' enctype='multipart/form-data' action="index.php?c=sumf">
+<form method='post' enctype='multipart/form-data' action="index.php?c=newf">
 <input type="file" name="file" />
-<input type="text" name="pass" value="lol" />
-<input type="text" name="path" value="" />
-<input type="text" name="project" value="test2" />
-<input type="hidden" name="c" value="sumf" />
+<input type="text" name="pass" value="pass" />
+<input type="text" name="path" value="path" />
+<input type="text" name="project" value="project" />
 <input type="submit" title="Wyślij"/>
+</form>

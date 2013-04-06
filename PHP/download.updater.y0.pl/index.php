@@ -94,16 +94,4 @@
       echo "</content>";
   }
 
-  #echo "Project: " . $_GET['project'] . n;
-  #echo "File: " . $_GET['file'];
-  $f = $_FILES['file'];
-  if ($f)
-  {
-      $c = file_get_contents($f["tmp_name"]);
-      $db->insert("files", "id,name,path,project,content", "'', '" . $f["name"] . "', '', '1', '" . mysql_real_escape_string($c) .
-          "'");
-      echo "Wstawiono!";
-      echo $c;
-  }
-
 ?>
