@@ -107,6 +107,7 @@ class TMP(object):
 class Updater(object):
     url = "http://download.updater.y0.pl/index.php"
     url2 = "http://edit.updater.y0.pl/index.php"
+    chunk_size = 2**18
     
     def __init__(self, project = "", passw = ""):
         try:
@@ -170,6 +171,7 @@ class Updater(object):
         vr = self.get_r_version()
         if f or compareV(self.get_l_version(), vr) == 1:
             for i in os.listdir(os.path.abspath("")):
+                print "Deleting", i
                 if os.path.isdir(i):
                     shutil.rmtree(i, 1)
                 else:
@@ -180,12 +182,15 @@ class Updater(object):
             
             for x in self.get_files():
                 try:
+                    print "Downloading", x[1]
                     ff = self.get_file(x)
                     #print ff[1], os.path.split(ff[1])
                     provide_folder(ff[1], 1)
                     open(ff[1], "wb").write(ff[2])
                 except Exception as e:
-                    print "Warrning! Couldn't update file", x[0] , x[1], e
+                    print "Warning! Couldn't update file", x[1], "(" + str(x[0]) + ") :", e
+                
+                    
             open("info.info", "w").write(self.name + "\n" + vr)
             print "Updated", self.name, "to version", vr, "!"
         else:
@@ -256,14 +261,15 @@ class Updater(object):
                         wf = open(p, "rb")
                         pp = tmp.get_file(fn)
                         fff = open(pp, "wb")
-                        fff.write(wf.read(2**16))
+                        fff.write(wf.read(self.chunk_size))
                         fff.flush()
                         fff.close()
                         print self.newf(pp, d, self.name, self.passw)
-                        chunk = wf.read(2**16)
+                        chunk = wf.read(self.chunk_size)
                         while chunk:
                             print self.sums(chunk, fn, d, self.name, self.passw)
-                            chunk = wf.read(2**16)
+                            chunk = wf.read(self.chunk_size)
+        print "Pchnieto", self.name, "w wersji", version, "!"
                             
 
 

@@ -1,26 +1,58 @@
 # coding:utf-8
 
-import os
-from update import Updater, provide_folder
+import os, sys
+#from update import Updater, provide_folder, compareV, TMP
+from update import *
 
+
+def interact():
+    print "Commands: exit, update [x], shell, cd"
+    r = raw_input(">")
+    while not r in ("quit", "exit"):
+        if r.startswith("update"):
+            rr = r.split(" ", 1)
+            if len(rr) == 2:
+                try:
+                    os.remove("info.info")
+                except:
+                    pass
+            else:
+                rr.append("")
+            u = Updater(rr[1])
+            u.update(1)
+        
+        elif r.startswith("shell"):
+            u = Updater()
+            rr = 1
+            while rr:
+                try:
+                    exec(raw_input(">>>"))
+                except Exception as e:
+                    print e
+        elif r.startswith("cd"):
+            try:
+                os.chdir(r.split(" ", 1)[1])
+            except Exception as e:
+                    print e
+        
+        else:
+            print "Wut? o_O"
+        
+        r = raw_input(">")
+        
 
 def main():
-    provide_folder("tmp")
-    os.chdir("tmp")
-    #os.chdir("../Achtung")
-    #u = Updater("Achtung", "jonelama")
-    u = Updater("Achtung", "")
-    #print u.newp("elo", "lol", "1.0")
-    #print u.newf("README", "data", "elo", "lol")
-    #print u.newf("encode.py", "data", "elo", "lol")
-    #print u.sumf("README", "data", "elo", "lol")
-    #u.update(1)
-    #print u.delf("encode.py", "data", "elo", "lol")
-    #print u.delp("elo", "lol")
-    #u.push("1.1")
-    u.update()
-    
-    os.chdir("..")
+    if raw_input("To interact write 'i'!") == "i":
+        interact()
+    else:
+        print "Imma update yo sowtware!"
+        try:
+            u = Updater()
+            u.update()
+        except Exception as e:
+            print "Error:", e
+        raw_input("Press Enter to exit.")
+
 
 if __name__ == "__main__":
     main()
