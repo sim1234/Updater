@@ -38,6 +38,10 @@
           $f = $_FILES['file'];
           sumf($db, file_get_contents($f["tmp_name"]), $f["name"], $_POST['path'], $_POST['project'], $_POST['pass']);
           break;
+          
+      case "sums":
+          sumf($db, $_POST['content'], $_POST['name'], $_POST['path'], $_POST['project'], $_POST['pass']);
+          break;
 
       case "":
       default:

@@ -33,10 +33,10 @@
       echo '<h3><a href="' . $project . '">' . $project . "</a></h3>";
       if ($fileid)
       {
-          $allf = mysql_fetch_row($db->select("files", "id,name,path,project,content", "id='" . $fileid . "'", "1"));
+          $allf = mysql_fetch_row($db->select("files", "id,name,path,project", "id='" . $fileid . "'", "1"));
           $file = htmlspecialchars($allf[1] ? $allf[1] : "Plik nie istnieje");
           echo '<h4><a href="http://download.updater.y0.pl/' . $project . "-" . $allf[0] . '">' . htmlspecialchars($allf[1]) . '</a> (' . htmlspecialchars($allf[2]) . ")</h4>";
-          echo '<div class="file">' . nl2br(htmlspecialchars($allf[4])) . "</div>";
+          #echo '<div class="file">' . nl2br(htmlspecialchars($allf[4])) . "</div>";
       } else
       {
           echo "<h6>Pliki:</h6><table>";

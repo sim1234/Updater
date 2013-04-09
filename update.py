@@ -1,5 +1,5 @@
 # coding:utf-8
-import urllib2, urllib, os, sys
+import urllib2, urllib, os, sys, time, shutil
 from encode import multipart_encode
 
 def get_data(s, delimiter):
@@ -34,7 +34,75 @@ def compareV(v1, v2):
         except:
             return 1
     return 0
+
+def provide_folder(path, iffile = 0):
+    p = path.split(os.path.sep)
+    if iffile:
+        p = p[:-1]
+    ppp = ""
+    for x in p:
+        ppp = os.path.join(ppp, x)
+        if not os.path.exists(ppp):
+            os.mkdir(ppp)
             
+
+class TMP(object):
+    def __init__(self):
+        self.d = []
+        self.f = []
+    
+    def get_folder(self, name = "", empty = 1):
+        if not empty:
+            if len(self.d):
+                return self.d[0]
+            else:
+                return self.get_folder(name, 1)
+        else:
+            name = os.path.abspath(str(name) or "tmp")
+            p = name
+            x = 0
+            while os.path.exists(p):
+                p = name + str(x)
+            os.mkdir(p)
+            self.d.append(p)
+            return os.path.relpath(p, os.path.abspath(""))
+    
+    def get_file(self, name = ""):
+        if not len(self.d):
+            self.get_folder()
+
+        if name:
+            for d in self.d:
+                p = os.path.join(d, name)
+                if not os.path.exists(p):
+                    open(p, "wb").close()
+                    self.f.append(p)
+                    return p
+            p = os.path.join(self.get_folder(empty=1), name)
+            open(p, "wb").close()
+            self.f.append(p)
+            return p
+        
+        p = os.path.join(self.d[0], "tmp.tmp")
+        x = 0
+        while not os.path.exists(p):
+            p = os.path.join(self.d[0], "tmp" + str(x) + ".tmp")
+            x += 1
+        open(p, "wb").close()
+        self.f.append(p)
+        return p
+    
+    def __del__(self):
+        for f in self.f:
+            if os.path.exists(f):
+                os.remove(f)
+        for d in self.d:
+            shutil.rmtree(d, 1)
+         
+            
+        
+    
+
 
 class Updater(object):
     url = "http://download.updater.y0.pl/index.php"
@@ -42,7 +110,7 @@ class Updater(object):
     
     def __init__(self, project = "", passw = ""):
         try:
-            self.name = open("info.info").readlines()[0]
+            self.name = open("info.info").readlines()[0][:-1]
         except:
             self.name = project
         self.passw = passw
@@ -101,12 +169,23 @@ class Updater(object):
     def update(self, f = 0):
         vr = self.get_r_version()
         if f or compareV(self.get_l_version(), vr) == 1:
+            for i in os.listdir(os.path.abspath("")):
+                if os.path.isdir(i):
+                    shutil.rmtree(i, 1)
+                else:
+                    try:
+                        os.remove(i)
+                    except:
+                        pass
+            
             for x in self.get_files():
                 try:
                     ff = self.get_file(x)
+                    #print ff[1], os.path.split(ff[1])
+                    provide_folder(ff[1], 1)
                     open(ff[1], "wb").write(ff[2])
-                except:
-                    print "Warrning! Couldn't update file", x[0] , x[1]
+                except Exception as e:
+                    print "Warrning! Couldn't update file", x[0] , x[1], e
             open("info.info", "w").write(self.name + "\n" + vr)
             print "Updated", self.name, "to version", vr, "!"
         else:
@@ -124,7 +203,7 @@ class Updater(object):
         data = {"path" : str(path),
                 "pass" : str(passw),
                 "project" : str(project),
-                "file" : open(filee)}
+                "file" : open(filee, "rb")}
         r = self.get_url(self.url2 + "?c=newf", data)
         return get_data(r, "content")[0][2:-1]
     
@@ -147,14 +226,53 @@ class Updater(object):
         data = {"path" : str(path),
                 "pass" : str(passw),
                 "project" : str(project),
-                "file" : open(filee)}
+                "file" : open(filee, "rb")}
         r = self.get_url(self.url2 + "?c=sumf", data)
         return get_data(r, "content")[0][2:-1]
+    
+    def sums(self, content, name, path, project, passw):
+        data = {"path" : str(path),
+                "pass" : str(passw),
+                "project" : str(project),
+                "content" : str(content),
+                "name" : str(name)}
+        r = self.get_url(self.url2 + "?c=sums", data)
+        return get_data(r, "content")[0][2:-1]
+    
+    def push(self, version):
+        print self.delp(self.name, self.passw)
+        print self.newp(self.name, self.passw, version)
+        tmp = TMP()
+        #tmp.get_folder("../pushtmp")
+        for root, dirs, files in os.walk(os.path.abspath("")):
+            rr = os.path.relpath(root, os.path.abspath(""))
+            if rr == "" or rr == "." or not ("\\." in rr or rr.startswith(".") or "\\~" in rr or rr.startswith("~")):
+                for f in files:
+                    if (not f.startswith(".")) and (not f == "info.info"):
+                        p = os.path.join(rr, f)
+                        print "Dodawanie '" + str(p) + "':"
+                        d, fn = os.path.split(p)
+                        #print self.newf(p, d, self.name, self.passw)
+                        wf = open(p, "rb")
+                        pp = tmp.get_file(fn)
+                        fff = open(pp, "wb")
+                        fff.write(wf.read(2**16))
+                        fff.flush()
+                        fff.close()
+                        print self.newf(pp, d, self.name, self.passw)
+                        chunk = wf.read(2**16)
+                        while chunk:
+                            print self.sums(chunk, fn, d, self.name, self.passw)
+                            chunk = wf.read(2**16)
+                            
 
 
 
 
  
 if __name__ == "__main__":
-    Updater().update()
-    raw_input("Enter by zakończyć...")
+    u = Updater()
+    u.update(u.get_l_version() == "0")
+    #raw_input("Enter by zakończyć...")
+    time.sleep(3)
+    

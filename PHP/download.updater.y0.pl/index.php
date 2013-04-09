@@ -15,18 +15,22 @@
       $projectid = $allp[0];
       if ($fileid)
       {
-          $allf = mysql_fetch_row($db->select("files", "id,name,path,project,content", "id='" . $fileid . "'"));
+          $allf = mysql_fetch_row($db->select("files", "id,name,path,project", "id='" . $fileid . "'"));
           if (!$allf[0])
           {
               header('Content-Type: application/octet-stream');
               header("HTTP/1.0 404 Not Found");
           } else
           {
-              $content = $allf[4];
-              $size = strlen($content);
+              $size = 0;
+              $content = "";
+              $idz = $db->select("filechunks", "id,file,content", "file='$fileid'", "", "id");
+              while ($row = mysql_fetch_array($idz)){
+                  $size += strlen($row[2]);
+                  $content .= $row[2];
+              }
               $begin = 0;
               $end = $size;
-
               if (isset($_SERVER['HTTP_RANGE']))
               {
                   if (preg_match('/bytes=\h*(\d+)-(\d*)[\D.*]?/i', $_SERVER['HTTP_RANGE'], $matches))
@@ -56,6 +60,7 @@
               ob_clean();
               ob_flush();
               flush();
+              
               $r = substr($content, $begin, $end - $begin);
               if ($r)
               {

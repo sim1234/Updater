@@ -36,6 +36,7 @@
   }
 
   function check_sj($string) {
+      return mysql_real_escape_string($string);
       $wla = $string;
       $string = trim($string);
 
