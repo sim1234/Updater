@@ -69,13 +69,13 @@
   }
   
 ?>
-<form method='post' enctype='multipart/form-data' action="http:///edit.updater.y0.pl/index.php?c=newf">
-<input type="file" name="file" />
-<input type="text" name="pass" value="pass" />
-<input type="text" name="path" value="path" />
-<input type="text" name="project" value="project" />
-<input type="submit" title="Wyślij"/>
-</form>
+<div>
+<h6 style="font-size: larger;">Software:</h6>
+<a href="Updater.zip">Updater.zip</a><br />
+<a href="Update.exe">Update.exe</a><br />
+<a href="update.dll">update.dll</a><br />
+<a href="w9xpopen.exe">w9xpopen.exe</a><br />
+</div>
 </div>
 </body>
 </html>

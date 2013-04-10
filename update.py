@@ -253,7 +253,7 @@ class Updater(object):
             rr = os.path.relpath(root, os.path.abspath(""))
             if rr == "" or rr == "." or not ("\\." in rr or rr.startswith(".") or "\\~" in rr or rr.startswith("~")):
                 for f in files:
-                    if (not f.startswith(".")) and (not f == "info.info"):
+                    if (not f.startswith(".")):
                         p = os.path.join(rr, f)
                         print "Dodawanie '" + str(p) + "':"
                         d, fn = os.path.split(p)
