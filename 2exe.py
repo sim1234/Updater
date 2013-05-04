@@ -17,7 +17,7 @@ if __name__ == "__main__":
                "compressed" : 1,
                "bundle_files" : 1,
                }        
-    setup(console = ['main.py'], zipfile = "update.dll", options = {"py2exe" : options})
+    setup(console = ['main.py'], zipfile = None, options = {"py2exe" : options})
     
     
     if os.path.isdir('build'): #Clean up build dir
